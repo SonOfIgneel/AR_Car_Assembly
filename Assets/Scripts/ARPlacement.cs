@@ -15,6 +15,13 @@ public class ARPlacement : MonoBehaviour
     private Pose PlacementPose;
     private ARRaycastManager aRRaycastManager;
     private bool placementPoseIsValid = false;
+    private bool showingParts = true;
+    public TextMeshProUGUI showtext;
+    public List<Canvas> canvasobj = new List<Canvas>();
+    public GameObject leftdoor, rightdoor;
+    public GameObject showbutton;
+    public GameObject engineon;
+    public AudioSource engineaudio;
 
     void Start()
     {
@@ -64,6 +71,58 @@ public class ARPlacement : MonoBehaviour
     void ARPlaceObject()
     {
         spawnedObject = Instantiate(arObjectToSpawn, PlacementPose.position, PlacementPose.rotation);
+        leftdoor = spawnedObject.transform.GetChild(1).gameObject;
+        rightdoor = spawnedObject.transform.GetChild(2).gameObject;
+        Canvas[] canvasobjs = spawnedObject.GetComponentsInChildren<Canvas>();
+
+        canvasobj.AddRange(canvasobjs);
+
+        foreach (Canvas canvas in canvasobj)
+        {
+            canvas.gameObject.SetActive(false);
+        }
+
+        showbutton.SetActive(true);
+        engineon.SetActive(true);
+    }
+
+    public void show()
+    {
+        if (showingParts)
+        {
+            showingParts = false;
+            showtext.text = "Hide Parts Name";
+            Vector3 currentRotationleft = leftdoor.transform.eulerAngles;
+            Vector3 currentRotationright = rightdoor.transform.eulerAngles;
+            currentRotationleft.y = 40;
+            currentRotationright.y = -40f;
+            leftdoor.transform.eulerAngles = currentRotationleft;
+            rightdoor.transform.eulerAngles = currentRotationright;
+            foreach (Canvas canvas in canvasobj)
+            {
+                canvas.gameObject.SetActive(true);
+            }
+        }
+        else
+        {
+            showingParts = true;
+            showtext.text = "Show Parts Name";
+            Vector3 currentRotationleft = leftdoor.transform.eulerAngles;
+            Vector3 currentRotationright = rightdoor.transform.eulerAngles;
+            currentRotationleft.y = 0;
+            currentRotationright.y = 0;
+            leftdoor.transform.eulerAngles = currentRotationleft;
+            rightdoor.transform.eulerAngles = currentRotationright;
+            foreach (Canvas canvas in canvasobj)
+            {
+                canvas.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    public void engine()
+    {
+        engineaudio.Play();
     }
 }
 
